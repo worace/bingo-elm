@@ -24,8 +24,21 @@ pageFooter =
              [text "Prag Studio"]
          ]
 
+entryList =
+  ul [] [ entryItem "Future-Proof" 100,
+          entryItem "Doing Agile" 200]
+
+entryItem phrase points =
+  li []
+       [ span [ class "phrase" ] [text phrase],
+         span [class "points"] [text (toString points)]
+       ]
+
 view =
-  div [ id "container" ] [pageHeader, pageFooter]
+  div [ id "container" ]
+        [pageHeader,
+         entryList,
+         pageFooter]
 
 main = view
 
