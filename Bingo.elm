@@ -5,6 +5,24 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import String exposing (toUpper, repeat, trimRight)
 
+-- MODEL
+
+newEntry phrase points id =
+  { phrase = phrase,
+    points = points,
+    wasSpoken = False,
+    id = id
+  }
+
+initialModel =
+  {
+    entries = [ newEntry "Future-Proof" 100 1,
+               newEntry "In the Cloud" 300 3,
+               newEntry "Doing Agile" 200 2]
+  }
+
+-- View
+
 title message times =
   message ++ " "
     |> toUpper
@@ -24,21 +42,22 @@ pageFooter =
              [text "Prag Studio"]
          ]
 
-entryList =
-  ul [] [ entryItem "Future-Proof" 100,
-          entryItem "Doing Agile" 200]
+entryList entries =
+  ul [] (List.map entryItem entries)
 
-entryItem phrase points =
+entryItem entry =
   li []
-       [ span [ class "phrase" ] [text phrase],
-         span [class "points"] [text (toString points)]
+       [ span [ class "phrase" ] [text entry.phrase],
+         span [class "points"] [text (toString entry.points)]
        ]
 
-view =
+view model =
   div [ id "container" ]
         [pageHeader,
-         entryList,
+         entryList model.entries,
          pageFooter]
 
-main = view
+-- Wire together
+
+main = view initialModel
 
