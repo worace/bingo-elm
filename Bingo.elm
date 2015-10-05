@@ -18,10 +18,14 @@ pageHeader =
 
 pageFooter =
   footer [ ]
-         [ a [ href "https://pragmaticstudio.com" ]
+         [ a [ href "https://pragmaticstudio.com",
+               target "blank"
+             ]
              [text "Prag Studio"]
          ]
 
-main =
-  div [] [pageHeader, pageFooter]
+view =
+  div [ id "container" ] [pageHeader, pageFooter]
+
+main = view
 
