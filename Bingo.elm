@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import String exposing (toUpper, repeat, trimRight)
+import StartApp
 
 -- MODEL
 
@@ -60,16 +61,19 @@ entryItem entry =
          span [class "points"] [text (toString entry.points)]
        ]
 
-view model =
+view address model =
   div [ id "container" ]
         [pageHeader,
          entryList model.entries,
+         button [ class "sort",
+                  onClick address Sort
+                ]
+                [ text "Sort" ],
          pageFooter]
 
--- Wire together
-
 main =
-  initialModel
-  |> update Sort
-  |> view
-
+  StartApp.start
+    { model = initialModel,
+      view = view,
+      update = update
+    }
