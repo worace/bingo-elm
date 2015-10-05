@@ -21,6 +21,15 @@ initialModel =
                newEntry "Doing Agile" 200 2]
   }
 
+-- Update
+
+type Action = NoOp | Sort
+
+update action model =
+  case action of
+    NoOp -> model
+    Sort -> {model | entries <- List.sortBy .points model.entries}
+
 -- View
 
 title message times =
@@ -59,5 +68,8 @@ view model =
 
 -- Wire together
 
-main = view initialModel
+main =
+  initialModel
+  |> update Sort
+  |> view
 
