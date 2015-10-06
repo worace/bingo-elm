@@ -12,14 +12,6 @@ import StartApp
 type alias Entry =
   {phrase: String, points: Int, wasSpoken: Bool, id: Int}
 
-newEntry : String -> Int -> Int -> Entry
-newEntry phrase points id =
-  { phrase = phrase,
-    points = points,
-    wasSpoken = False,
-    id = id
-  }
-
 type alias Model =
                  {
                    entries: List Entry
@@ -28,9 +20,9 @@ type alias Model =
 initialModel : Model
 initialModel =
   {
-    entries = [ newEntry "Future-Proof" 100 1,
-               newEntry "In the Cloud" 300 3,
-               newEntry "Doing Agile" 200 2]
+    entries = [ Entry "Future-Proof" 100 False 1,
+                Entry "In the Cloud" 300 False 3,
+                Entry "Doing Agile" 200 False 2]
   }
 
 -- Update
