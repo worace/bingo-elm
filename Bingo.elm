@@ -42,6 +42,7 @@ type Action
   | Mark Int
   | UpdatePhraseInput String
   | UpdatePointsInput String
+  | AddEntry
 
 update : Action -> Model -> Model
 update action model =
@@ -66,6 +67,22 @@ update action model =
       { model | phraseInput <- contents }
     UpdatePointsInput contents ->
       { model | pointsInput <- contents}
+    AddEntry ->
+      let
+        entryToAdd =
+          Entry model.phraseInput (Utils.parseInt model.pointsInput) False model.nextID
+        isInvalid model =
+          String.isEmpty model.phraseInput || String.isEmpty model.pointsInput
+      in
+        if isInvalid model
+        then model
+        else
+          {model |
+           phraseInput <- "",
+           pointsInput <- "",
+           entries <- entryToAdd :: model.entries,
+           nextID <- model.nextID + 1
+          }
 
 totalPoints : List Entry -> Int
 totalPoints entries =
@@ -133,7 +150,9 @@ entryForm address model =
                 name "points",
                 Utils.onInput address UpdatePointsInput
               ] [],
-        button [ class "add" ] [ text "Add" ],
+        button [ class "add",
+                 onClick address AddEntry
+               ] [ text "Add" ],
         h2 [] [ text (model.phraseInput ++ " " ++ model.pointsInput)]
       ]
 
