@@ -24,7 +24,11 @@ initialModel =
 
 -- Update
 
-type Action = NoOp | Sort | Delete Int
+type Action
+  = NoOp
+  | Sort
+  | Delete Int
+  | Mark Int
 
 update action model =
   case action of
@@ -36,6 +40,14 @@ update action model =
           List.filter (\e -> e.id /= id) model.entries
       in
         { model | entries <- remainingEntries}
+    Mark id ->
+      let
+        updateEntry e =
+          if e.id == id
+          then { e | wasSpoken <- (not e.wasSpoken) }
+          else e
+      in
+        { model | entries <- List.map updateEntry model.entries}
 
 -- View
 
@@ -59,16 +71,35 @@ pageFooter =
          ]
 
 entryList address entries =
-  ul [] (List.map (entryItem address) entries)
+  let
+    entryItems = List.map (entryItem address) entries
+    items = entryItems ++ [totalItem (totalPoints entries)]
+  in
+    ul [] items
 
 entryItem address entry =
-  li []
-       [ span [ class "phrase" ] [text entry.phrase],
+  li [ classList [ ("highlight", entry.wasSpoken) ],
+                 onClick address (Mark entry.id)
+     ]
+  [ span [ class "phrase" ] [text entry.phrase],
          span [class "points"] [text (toString entry.points)],
-         button
-           [ class "delete", onClick address (Delete entry.id)]
-           [ ]
+              button
+              [ class "delete", onClick address (Delete entry.id)]
+              [ ]
        ]
+
+totalPoints entries =
+  let
+    spokenEntries = List.filter .wasSpoken entries
+  in
+    List.sum (List.map .points spokenEntries)
+
+totalItem total =
+  li [ class "total" ]
+     [
+      span [class "label" ] [ text "Total" ],
+      span [class "points" ] [text (toString total)]
+     ]
 
 view address model =
   div [ id "container" ]
