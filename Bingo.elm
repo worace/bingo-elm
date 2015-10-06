@@ -6,6 +6,7 @@ import Html.Events exposing (..)
 import String exposing (toUpper, repeat, trimRight)
 import Signal exposing (Address)
 import StartApp
+import BingoUtils as Utils
 
 -- MODEL
 
@@ -14,7 +15,10 @@ type alias Entry =
 
 type alias Model =
                  {
-                   entries: List Entry
+                   entries: List Entry,
+                   phraseInput: String,
+                   pointsInput: String,
+                   nextID: Int
                  }
 
 initialModel : Model
@@ -22,7 +26,11 @@ initialModel =
   {
     entries = [ Entry "Future-Proof" 100 False 1,
                 Entry "In the Cloud" 300 False 3,
-                Entry "Doing Agile" 200 False 2]
+                Entry "Rock-Star Ninja" 400 False 4,
+                Entry "Doing Agile" 200 False 2],
+    phraseInput = "",
+    pointsInput = "",
+    nextID = 5
   }
 
 -- Update
@@ -32,6 +40,8 @@ type Action
   | Sort
   | Delete Int
   | Mark Int
+  | UpdatePhraseInput String
+  | UpdatePointsInput String
 
 update : Action -> Model -> Model
 update action model =
@@ -52,6 +62,17 @@ update action model =
           else e
       in
         { model | entries <- List.map updateEntry model.entries}
+    UpdatePhraseInput contents ->
+      { model | phraseInput <- contents }
+    UpdatePointsInput contents ->
+      { model | pointsInput <- contents}
+
+totalPoints : List Entry -> Int
+totalPoints entries =
+  let
+    spokenEntries = List.filter .wasSpoken entries
+  in
+    List.sum (List.map .points spokenEntries)
 
 -- View
 
@@ -97,12 +118,24 @@ entryItem address entry =
               [ ]
        ]
 
-totalPoints : List Entry -> Int
-totalPoints entries =
-  let
-    spokenEntries = List.filter .wasSpoken entries
-  in
-    List.sum (List.map .points spokenEntries)
+entryForm : Address Action -> Model -> Html
+entryForm address model =
+  div []
+      [ input [ type' "text",
+               placeholder "Phrase",
+               value model.phraseInput,
+               autofocus True,
+               Utils.onInput address UpdatePhraseInput
+              ] [],
+        input [ type' "number",
+                placeholder "Points",
+                value model.pointsInput,
+                name "points",
+                Utils.onInput address UpdatePointsInput
+              ] [],
+        button [ class "add" ] [ text "Add" ],
+        h2 [] [ text (model.phraseInput ++ " " ++ model.pointsInput)]
+      ]
 
 totalItem : Int -> Html
 totalItem total =
@@ -116,6 +149,7 @@ view : Address Action -> Model -> Html
 view address model =
   div [ id "container" ]
         [pageHeader,
+         entryForm address model,
          entryList address model.entries,
          button [ class "sort",
                   onClick address Sort
